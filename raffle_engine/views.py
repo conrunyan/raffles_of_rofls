@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+# makes call to database to get next winner of a session
+def getSessionWinner(sessionID):
+    pass

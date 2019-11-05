@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'raffle_engine.apps.RaffleEngineConfig',
     'raffle_site.apps.RaffleSiteConfig',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import Participant, RaffleSession
 
 def index(request):
-    return HttpResponse("Home Page")
+    return render(request, 'raffle_site/index.html')
 
 def raffle_setup_page(request, session_key):
     session = get_object_or_404(RaffleSession, pk=session_key)

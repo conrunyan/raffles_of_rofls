@@ -43,7 +43,7 @@ class Session(models.Model):
 class Host(models.Model):
     name = models.CharField("Name", max_length=50)
     host_token = models.CharField("Host Token", primary_key=True, max_length=50)
-    session_id = models.OneToOneKey(Session, on_delete=models.CASCADE)
+    session_id = models.ForeignKey(Session, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

@@ -41,7 +41,22 @@ class TestHost(TestCase):
 
 
 class TestSession(TestCase):
-    pass
+    def create_winner(self, name: str, ip_addr:  str = '0.0.0.0'):
+        tmp_user = User.objects.create(name=name, ip_address=ip_addr)
+        return Winner.objects.create(user=tmp_user)
+
+    def test_constructor(self):
+        session = Session('ABC123')
+        self.assertTrue(isinstance(session, Session))
+        self.assertEqual('ABC123', str(session))
+
+    def test_add_winner_first_winner(self):
+        session = Session('ABC123')
+        winner = self.create_winner('Shaggy')
+        self.assertIsNone(session.winner)
+        session.add_winner(winner)
+        self.assertEqual(winner, session.winner)
+        
 
 
 class TestWinner(TestCase):

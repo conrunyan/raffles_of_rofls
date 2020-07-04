@@ -60,4 +60,7 @@ class TestSession(TestCase):
 
 
 class TestWinner(TestCase):
-    pass
+    def test_constructor(self):
+        session = Session.objects.create(session_id='ABC123')
+        tmp_user = User.objects.create(name='Scooby', ip_address='0.0.0.0')
+        winner = Winner.objects.create(user=tmp_user, session=session)

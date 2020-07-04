@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.crypto import get_random_string
 
 
-
 class User(models.Model):
     name = models.CharField("Name", max_length=50)
     ip_address = models.GenericIPAddressField()
@@ -35,7 +34,7 @@ class Winner(models.Model):
         Session, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.user
 
 
 class Host(models.Model):

@@ -71,7 +71,7 @@ class Host(models.Model):
         token_already_exists = True
         # Loop until we find a new token
         while token_already_exists:
-            token = get_random_string(length=NUM_CHARS)
+            token = get_random_string(length=NUM_CHARS).upper()
             try:
                 Session.objects.get(session_id=token)
             except Session.DoesNotExist:

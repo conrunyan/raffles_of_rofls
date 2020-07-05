@@ -12,6 +12,7 @@ class User(models.Model):
     ip_address = models.GenericIPAddressField()
     logger.debug(
         f'New User object created: Name - {name}, IP Address - {ip_address}')
+    session_id = models.ForeignKey('Session', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -34,8 +35,6 @@ class Winner(models.Model):
 class Session(models.Model):
     session_id = models.CharField(
         "Session_ID", primary_key=True, max_length=50)
-    participant = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True)
     started_time = models.DateTimeField("Start Time", auto_now=True)
     end_time = models.DateField("End Time", blank=True, null=True)
 
@@ -46,13 +45,19 @@ class Session(models.Model):
         try:
             logger.info(
                 f'Adding new Winner to Session: User - {user_instance}, Session - {self}')
-            Winner.objects.create(user=user_instance, session=self)
+            return Winner.objects.create(user=user_instance, session=self)
         except IntegrityError:
             logger.warning(f'Tried to add duplicate Winner to current session')
 
-    def add_participant(self):
+    def add_participant(self, username: str, ip_addr: str):
         # TODO: participant cannot be added if another user with the same IP address is already in the session
-        pass
+        try:
+            logger.inf(
+                f'Adding User {username} at IP {ip_addr} to current session {self}')
+            return User.objects.create(name=username, ip_address=ip_addr, session=self)
+        except IntegrityError:
+            logger.warning(
+                f'Tried to add duplicate user {username},{ip_addr} to current session.')
 
 
 class Host(models.Model):

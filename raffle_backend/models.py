@@ -14,6 +14,9 @@ class User(models.Model):
         f'New User object created: Name - {name}, IP Address - {ip_address}')
     session = models.ForeignKey('Session', on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = (('ip_address', 'session'))
+
     def __str__(self):
         return self.name
 
@@ -51,7 +54,7 @@ class Session(models.Model):
     def add_participant(self, username: str, ip_addr: str):
         # TODO: participant cannot be added if another user with the same IP address is already in the session
         try:
-            logger.inf(
+            logger.info(
                 f'Adding User {username} at IP {ip_addr} to current session {self}')
             return User.objects.create(name=username, ip_address=ip_addr, session=self)
         except IntegrityError:

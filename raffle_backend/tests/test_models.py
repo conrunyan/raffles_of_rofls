@@ -67,7 +67,7 @@ class TestSession(TestCase):
         user = User.objects.create(
             name='Shaggy', ip_address='0.0.0.0', session=session)
         user2 = User.objects.create(
-            name='Daphne', ip_address='0.0.0.0', session=session)
+            name='Daphne', ip_address='0.0.0.1', session=session)
 
         session.add_winner(user_instance=user)
         session.add_winner(user_instance=user2)
@@ -91,6 +91,26 @@ class TestSession(TestCase):
 
         self.assertIsNotNone(Winner.objects.get(user=user))
         self.assertEqual(1, len(Winner.objects.all()))
+
+    def test_add_participant_first_participant(self):
+        session = Session.objects.create(session_id='ABC123')
+        session.add_participant(
+            username='Velma', ip_addr='0.0.0.0')
+        self.assertIsNotNone(User.objects.get(name='Velma', ip_address='0.0.0.0', session=session))
+
+    def test_add_participant_not_first_participant(self):
+        session = Session.objects.create(session_id='ABC123')
+        session.add_participant(
+            username='Velma', ip_addr='0.0.0.0')
+        session.add_participant(
+            username='Fred', ip_addr='0.0.0.1')
+        self.assertEqual(2, len(User.objects.filter(session=session)))
+
+    def test_add_participant_duplicate_participant(self):
+        self.fail()
+
+    def test_add_participant_same_ip_address_as_existing_participant(self):
+        self.fail()
 
 
 class TestWinner(TestCase):

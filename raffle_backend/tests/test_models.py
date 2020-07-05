@@ -96,7 +96,8 @@ class TestSession(TestCase):
         session = Session.objects.create(session_id='ABC123')
         session.add_participant(
             username='Velma', ip_addr='0.0.0.0')
-        self.assertIsNotNone(User.objects.get(name='Velma', ip_address='0.0.0.0', session=session))
+        self.assertIsNotNone(User.objects.get(
+            name='Velma', ip_address='0.0.0.0', session=session))
 
     def test_add_participant_not_first_participant(self):
         session = Session.objects.create(session_id='ABC123')
@@ -110,12 +111,10 @@ class TestSession(TestCase):
         session = Session.objects.create(session_id='ABC123')
         session.add_participant(
             username='Velma', ip_addr='0.0.0.0')
-        session.add_participant(
-            username='Scrappy', ip_addr='0.0.0.0')
+        with transaction.atomic():
+            session.add_participant(
+                username='Scrappy', ip_addr='0.0.0.0')
         self.assertEqual(1, len(User.objects.filter(session=session)))
-
-    def test_add_participant_same_ip_address_as_existing_participant(self):
-        self.fail()
 
 
 class TestWinner(TestCase):

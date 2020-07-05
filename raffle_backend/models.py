@@ -52,14 +52,14 @@ class Session(models.Model):
             logger.warning(f'Tried to add duplicate Winner to current session')
 
     def add_participant(self, username: str, ip_addr: str):
-        # TODO: participant cannot be added if another user with the same IP address is already in the session
+        # DONE: participant cannot be added if another user with the same IP address is already in the session
         try:
             logger.info(
                 f'Adding User {username} at IP {ip_addr} to current session {self}')
             return User.objects.create(name=username, ip_address=ip_addr, session=self)
         except IntegrityError:
             logger.warning(
-                f'Tried to add duplicate user {username},{ip_addr} to current session.')
+                f'Tried to add duplicate user {username}:{ip_addr} to current session.')
 
 
 class Host(models.Model):

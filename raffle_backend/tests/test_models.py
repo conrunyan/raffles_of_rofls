@@ -107,7 +107,12 @@ class TestSession(TestCase):
         self.assertEqual(2, len(User.objects.filter(session=session)))
 
     def test_add_participant_duplicate_participant(self):
-        self.fail()
+        session = Session.objects.create(session_id='ABC123')
+        session.add_participant(
+            username='Velma', ip_addr='0.0.0.0')
+        session.add_participant(
+            username='Scrappy', ip_addr='0.0.0.0')
+        self.assertEqual(1, len(User.objects.filter(session=session)))
 
     def test_add_participant_same_ip_address_as_existing_participant(self):
         self.fail()

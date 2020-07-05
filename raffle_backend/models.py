@@ -1,13 +1,34 @@
+import logging
+
 from django.db import models
 from django.utils.crypto import get_random_string
+from django.db.utils import IntegrityError
+
+logger = logging.getLogger(__name__)
 
 
 class User(models.Model):
     name = models.CharField("Name", max_length=50)
     ip_address = models.GenericIPAddressField()
+    logger.debug(
+        f'New User object created: Name - {name}, IP Address - {ip_address}')
 
     def __str__(self):
         return self.name
+
+
+class Winner(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    session = models.ForeignKey(
+        'Session', on_delete=models.CASCADE, blank=True, null=True)
+
+    # https://stackoverflow.com/questions/16800375/how-can-set-two-primary-key-fields-for-my-models-in-django
+
+    class Meta:
+        unique_together = (('user', 'session'),)
+
+    def __str__(self):
+        return self.user
 
 
 class Session(models.Model):
@@ -21,20 +42,17 @@ class Session(models.Model):
     def __str__(self):
         return self.session_id
 
-    def add_winner(self, user_id):
-        pass
+    def add_winner(self, user_instance):
+        try:
+            logger.info(
+                f'Adding new Winner to Session: User - {user_instance}, Session - {self}')
+            Winner.objects.create(user=user_instance, session=self)
+        except IntegrityError:
+            logger.exception(f'Failed to add Winner to current session')
 
     def add_participant(self):
+        # TODO: participant cannot be added if another user with the same IP address is already in the session
         pass
-
-
-class Winner(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    session = models.ForeignKey(
-        Session, on_delete=models.CASCADE, blank=True, null=True)
-
-    def __str__(self):
-        return self.user
 
 
 class Host(models.Model):

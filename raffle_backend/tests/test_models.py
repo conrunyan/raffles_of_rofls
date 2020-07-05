@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.db.utils import IntegrityError
 from raffle_backend.models import (
     User,
     Winner,
@@ -41,9 +42,6 @@ class TestHost(TestCase):
 
 
 class TestSession(TestCase):
-    def create_winner(self, name: str, ip_addr:  str = '0.0.0.0'):
-        tmp_user = User.objects.create(name=name, ip_address=ip_addr)
-        return Winner.objects.create(user=tmp_user)
 
     def test_constructor(self):
         session = Session('ABC123')
@@ -51,12 +49,39 @@ class TestSession(TestCase):
         self.assertEqual('ABC123', str(session))
 
     def test_add_winner_first_winner(self):
-        session = Session('ABC123')
-        winner = self.create_winner('Shaggy')
-        self.assertIsNone(session.winner)
-        session.add_winner(winner)
-        self.assertEqual(winner, session.winner)
-        
+        session = Session.objects.create(session_id='ABC123')
+        user = User.objects.create(name='Shaggy', ip_address='0.0.0.0')
+
+        with self.assertRaises(Winner.DoesNotExist):
+            self.assertIsNone(Winner.objects.get(user=user))
+
+        session.add_winner(user_instance=user)
+
+        self.assertIsNotNone(Winner.objects.get(user=user))
+
+    def test_add_winner_second_winner(self):
+        session = Session.objects.create(session_id='ABC123')
+        user = User.objects.create(name='Shaggy', ip_address='0.0.0.0')
+        user2 = User.objects.create(name='Daphne', ip_address='0.0.0.0')
+
+        session.add_winner(user_instance=user)
+        session.add_winner(user_instance=user2)
+
+        self.assertIsNotNone(Winner.objects.get(user=user))
+        self.assertIsNotNone(Winner.objects.get(user=user2))
+        self.assertEqual(2, len(Winner.objects.all()))
+
+
+    def test_add_winner_duplicate_winner(self):
+        session = Session.objects.create(session_id='ABC123')
+        user = User.objects.create(name='Shaggy', ip_address='0.0.0.0')
+
+        session.add_winner(user_instance=user)
+        with self.assertRaises(IntegrityError):
+            session.add_winner(user_instance=user)
+
+        self.assertIsNotNone(Winner.objects.get(user=user))
+        self.assertEqual(1, len(Winner.objects.all()))
 
 
 class TestWinner(TestCase):

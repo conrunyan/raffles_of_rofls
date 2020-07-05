@@ -28,7 +28,7 @@ class Winner(models.Model):
         unique_together = (('user', 'session'),)
 
     def __str__(self):
-        return self.user
+        return f'Winner - Name: {self.user} Session: {self.session}'
 
 
 class Session(models.Model):
@@ -48,7 +48,7 @@ class Session(models.Model):
                 f'Adding new Winner to Session: User - {user_instance}, Session - {self}')
             Winner.objects.create(user=user_instance, session=self)
         except IntegrityError:
-            logger.exception(f'Failed to add Winner to current session')
+            logger.warning(f'Tried to add duplicate Winner to current session')
 
     def add_participant(self):
         # TODO: participant cannot be added if another user with the same IP address is already in the session

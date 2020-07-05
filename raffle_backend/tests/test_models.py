@@ -1,5 +1,6 @@
-from django.test import TestCase
+from django.db import transaction
 from django.db.utils import IntegrityError
+from django.test import TestCase
 from raffle_backend.models import (
     User,
     Winner,
@@ -71,14 +72,17 @@ class TestSession(TestCase):
         self.assertIsNotNone(Winner.objects.get(user=user2))
         self.assertEqual(2, len(Winner.objects.all()))
 
-
     def test_add_winner_duplicate_winner(self):
         session = Session.objects.create(session_id='ABC123')
         user = User.objects.create(name='Shaggy', ip_address='0.0.0.0')
-
+        # breakpoint()
         session.add_winner(user_instance=user)
-        with self.assertRaises(IntegrityError):
-            session.add_winner(user_instance=user)
+        try:
+            with transaction.atomic():
+                session.add_winner(user_instance=user)
+            # self.fail('Duplicate winner addition did not throw IntegrityError')
+        except IntegrityError:
+            pass
 
         self.assertIsNotNone(Winner.objects.get(user=user))
         self.assertEqual(1, len(Winner.objects.all()))

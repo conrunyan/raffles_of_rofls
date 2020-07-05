@@ -12,7 +12,8 @@ from raffle_backend.models import (
 class TestUser(TestCase):
     def test_base_constructor(self):
         session = Session.objects.create(session_id='ABC123')
-        user = Participant(name='Fred', ip_address='127.0.0.1', session=session)
+        user = Participant(
+            name='Fred', ip_address='127.0.0.1', session=session)
         self.assertTrue(isinstance(user, Participant))
         self.assertEqual('Fred', str(user))
 

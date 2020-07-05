@@ -11,7 +11,8 @@ from raffle_backend.models import (
 
 class TestUser(TestCase):
     def test_base_constructor(self):
-        user = User(name='Fred', ip_address='127.0.0.1')
+        session = Session.objects.create(session_id='ABC123')
+        user = User(name='Fred', ip_address='127.0.0.1', session=session)
         self.assertTrue(isinstance(user, User))
         self.assertEqual('Fred', str(user))
 
@@ -51,7 +52,8 @@ class TestSession(TestCase):
 
     def test_add_winner_first_winner(self):
         session = Session.objects.create(session_id='ABC123')
-        user = User.objects.create(name='Shaggy', ip_address='0.0.0.0')
+        user = User.objects.create(
+            name='Shaggy', ip_address='0.0.0.0', session=session)
 
         with self.assertRaises(Winner.DoesNotExist):
             self.assertIsNone(Winner.objects.get(user=user))
@@ -62,8 +64,10 @@ class TestSession(TestCase):
 
     def test_add_winner_second_winner(self):
         session = Session.objects.create(session_id='ABC123')
-        user = User.objects.create(name='Shaggy', ip_address='0.0.0.0')
-        user2 = User.objects.create(name='Daphne', ip_address='0.0.0.0')
+        user = User.objects.create(
+            name='Shaggy', ip_address='0.0.0.0', session=session)
+        user2 = User.objects.create(
+            name='Daphne', ip_address='0.0.0.0', session=session)
 
         session.add_winner(user_instance=user)
         session.add_winner(user_instance=user2)
@@ -74,7 +78,8 @@ class TestSession(TestCase):
 
     def test_add_winner_duplicate_winner(self):
         session = Session.objects.create(session_id='ABC123')
-        user = User.objects.create(name='Shaggy', ip_address='0.0.0.0')
+        user = User.objects.create(
+            name='Shaggy', ip_address='0.0.0.0', session=session)
         # breakpoint()
         session.add_winner(user_instance=user)
         try:
@@ -91,5 +96,6 @@ class TestSession(TestCase):
 class TestWinner(TestCase):
     def test_constructor(self):
         session = Session.objects.create(session_id='ABC123')
-        tmp_user = User.objects.create(name='Scooby', ip_address='0.0.0.0')
+        tmp_user = User.objects.create(
+            name='Scooby', ip_address='0.0.0.0', session=session)
         winner = Winner.objects.create(user=tmp_user, session=session)

@@ -12,7 +12,7 @@ class User(models.Model):
     ip_address = models.GenericIPAddressField()
     logger.debug(
         f'New User object created: Name - {name}, IP Address - {ip_address}')
-    session_id = models.ForeignKey('Session', on_delete=models.CASCADE)
+    session = models.ForeignKey('Session', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -24,7 +24,6 @@ class Winner(models.Model):
         'Session', on_delete=models.CASCADE, blank=True, null=True)
 
     # https://stackoverflow.com/questions/16800375/how-can-set-two-primary-key-fields-for-my-models-in-django
-
     class Meta:
         unique_together = (('user', 'session'),)
 

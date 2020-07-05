@@ -2,7 +2,7 @@ from django.db import transaction
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from raffle_backend.models import (
-    User,
+    Participant,
     Winner,
     Session,
     Host
@@ -12,8 +12,8 @@ from raffle_backend.models import (
 class TestUser(TestCase):
     def test_base_constructor(self):
         session = Session.objects.create(session_id='ABC123')
-        user = User(name='Fred', ip_address='127.0.0.1', session=session)
-        self.assertTrue(isinstance(user, User))
+        user = Participant(name='Fred', ip_address='127.0.0.1', session=session)
+        self.assertTrue(isinstance(user, Participant))
         self.assertEqual('Fred', str(user))
 
 
@@ -52,7 +52,7 @@ class TestSession(TestCase):
 
     def test_add_winner_first_winner(self):
         session = Session.objects.create(session_id='ABC123')
-        user = User.objects.create(
+        user = Participant.objects.create(
             name='Shaggy', ip_address='0.0.0.0', session=session)
 
         with self.assertRaises(Winner.DoesNotExist):
@@ -64,9 +64,9 @@ class TestSession(TestCase):
 
     def test_add_winner_second_winner(self):
         session = Session.objects.create(session_id='ABC123')
-        user = User.objects.create(
+        user = Participant.objects.create(
             name='Shaggy', ip_address='0.0.0.0', session=session)
-        user2 = User.objects.create(
+        user2 = Participant.objects.create(
             name='Daphne', ip_address='0.0.0.1', session=session)
 
         session.add_winner(user_instance=user)
@@ -78,16 +78,13 @@ class TestSession(TestCase):
 
     def test_add_winner_duplicate_winner(self):
         session = Session.objects.create(session_id='ABC123')
-        user = User.objects.create(
+        user = Participant.objects.create(
             name='Shaggy', ip_address='0.0.0.0', session=session)
         # breakpoint()
         session.add_winner(user_instance=user)
-        try:
-            with transaction.atomic():
-                session.add_winner(user_instance=user)
-            # self.fail('Duplicate winner addition did not throw IntegrityError')
-        except IntegrityError:
-            pass
+        # https://stackoverflow.com/questions/21458387/transactionmanagementerror-you-cant-execute-queries-until-the-end-of-the-atom
+        with transaction.atomic():
+            session.add_winner(user_instance=user)
 
         self.assertIsNotNone(Winner.objects.get(user=user))
         self.assertEqual(1, len(Winner.objects.all()))
@@ -96,7 +93,7 @@ class TestSession(TestCase):
         session = Session.objects.create(session_id='ABC123')
         session.add_participant(
             username='Velma', ip_addr='0.0.0.0')
-        self.assertIsNotNone(User.objects.get(
+        self.assertIsNotNone(Participant.objects.get(
             name='Velma', ip_address='0.0.0.0', session=session))
 
     def test_add_participant_not_first_participant(self):
@@ -105,7 +102,7 @@ class TestSession(TestCase):
             username='Velma', ip_addr='0.0.0.0')
         session.add_participant(
             username='Fred', ip_addr='0.0.0.1')
-        self.assertEqual(2, len(User.objects.filter(session=session)))
+        self.assertEqual(2, len(Participant.objects.filter(session=session)))
 
     def test_add_participant_duplicate_participant(self):
         session = Session.objects.create(session_id='ABC123')
@@ -114,12 +111,12 @@ class TestSession(TestCase):
         with transaction.atomic():
             session.add_participant(
                 username='Scrappy', ip_addr='0.0.0.0')
-        self.assertEqual(1, len(User.objects.filter(session=session)))
+        self.assertEqual(1, len(Participant.objects.filter(session=session)))
 
 
 class TestWinner(TestCase):
     def test_constructor(self):
         session = Session.objects.create(session_id='ABC123')
-        tmp_user = User.objects.create(
+        tmp_user = Participant.objects.create(
             name='Scooby', ip_address='0.0.0.0', session=session)
         winner = Winner.objects.create(user=tmp_user, session=session)

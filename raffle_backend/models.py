@@ -11,7 +11,7 @@ class Participant(models.Model):
     name = models.CharField("Name", max_length=50)
     ip_address = models.GenericIPAddressField()
     logger.debug(
-        f'New Participant object created: Name - {name}, IP Address - {ip_address}')
+        f'New User object created: Name - {name}, IP Address - {ip_address}')
     session = models.ForeignKey('Session', on_delete=models.CASCADE)
 
     class Meta:
@@ -22,16 +22,16 @@ class Participant(models.Model):
 
 
 class Winner(models.Model):
-    participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+    user = models.ForeignKey(Participant, on_delete=models.CASCADE)
     session = models.ForeignKey(
         'Session', on_delete=models.CASCADE, blank=True, null=True)
 
     # https://stackoverflow.com/questions/16800375/how-can-set-two-primary-key-fields-for-my-models-in-django
     class Meta:
-        unique_together = (('participant', 'session'),)
+        unique_together = (('user', 'session'),)
 
     def __str__(self):
-        return f'Winner - Name: {self.participant} Session: {self.session}'
+        return f'Winner - Name: {self.user} Session: {self.session}'
 
 
 class Session(models.Model):
@@ -43,23 +43,23 @@ class Session(models.Model):
     def __str__(self):
         return self.session_id
 
-    def add_winner(self, participant_instance: Participant):
+    def add_winner(self, user_instance):
         try:
             logger.info(
-                f'Adding new Winner to Session: Participant - {participant_instance}, Session - {self}')
-            return Winner.objects.create(participant=participant_instance, session=self)
+                f'Adding new Winner to Session: User - {user_instance}, Session - {self}')
+            return Winner.objects.create(user=user_instance, session=self)
         except IntegrityError:
             logger.warning(f'Tried to add duplicate Winner to current session')
 
-    def add_participant(self, articipantname: str, ip_addr: str):
-        # DONE: participant cannot be added if another Participant with the same IP address is already in the session
+    def add_participant(self, username: str, ip_addr: str):
+        # DONE: participant cannot be added if another user with the same IP address is already in the session
         try:
             logger.info(
-                f'Adding Participant {participantname} at IP {ip_addr} to current session {self}')
-            return Participant.objects.create(name=participantname, ip_address=ip_addr, session=self)
+                f'Adding User {username} at IP {ip_addr} to current session {self}')
+            return Participant.objects.create(name=username, ip_address=ip_addr, session=self)
         except IntegrityError:
             logger.warning(
-                f'Tried to add duplicate Participant {participantname}:{ip_addr} to current session.')
+                f'Tried to add duplicate user {username}:{ip_addr} to current session.')
 
 
 class Host(models.Model):

@@ -6,6 +6,7 @@ from raffle_backend import views
 router = routers.DefaultRouter()
 router.register(r'participants', views.ParticipantViewset)
 router.register(r'hosts', views.HostViewset)
+router.register(r'sessions', views.SessionViewset)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

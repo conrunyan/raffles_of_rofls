@@ -13,6 +13,7 @@ class Participant(models.Model):
     logger.debug(
         f'New User object created: Name - {name}, IP Address - {ip_address}')
     session = models.ForeignKey('Session', on_delete=models.CASCADE)
+    # TODO: Add session ID here, to be used to create session foreign key
 
     class Meta:
         unique_together = (('ip_address', 'session'))

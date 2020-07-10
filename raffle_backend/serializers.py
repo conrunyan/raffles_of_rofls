@@ -2,10 +2,12 @@ from raffle_backend.models import Participant, Session, Winner, Host
 from rest_framework import serializers
 
 
-class ParticipantSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Participant
-        fields = ['name', 'ip_address', 'session']
+class ParticipantSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=50)
+    ip_address = serializers.IPAddressField()
+    session_id = serializers.CharField(max_length=50)
+
+
 
 class HostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

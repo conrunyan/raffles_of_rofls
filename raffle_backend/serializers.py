@@ -10,10 +10,10 @@ class ParticipantSerializer(serializers.HyperlinkedModelSerializer):
 class HostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Host
-        fields = ['name', 'host_token', 'session']
+        fields = ['name', 'host_token']
 
 
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Session
-        fields = ['session_id', 'started_time']
+        fields = ['session_id', 'started_time', 'host_id']

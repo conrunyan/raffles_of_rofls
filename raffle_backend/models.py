@@ -13,7 +13,6 @@ class Participant(models.Model):
     logger.debug(
         f'New User object created: Name - {name}, IP Address - {ip_address}')
     session = models.ForeignKey('Session', on_delete=models.CASCADE)
-    # TODO: Add session ID here, to be used to create session foreign key
 
     class Meta:
         unique_together = (('ip_address', 'session'))
@@ -40,6 +39,8 @@ class Session(models.Model):
         "Session_ID", primary_key=True, max_length=50)
     started_time = models.DateTimeField("Start Time", auto_now=True)
     end_time = models.DateField("End Time", blank=True, null=True)
+    host_id = models.ForeignKey(
+        'Host', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.session_id
@@ -67,19 +68,20 @@ class Host(models.Model):
     name = models.CharField("Name", max_length=50)
     host_token = models.CharField(
         "Host Token", primary_key=True, max_length=50)
-    session = models.ForeignKey(
-        Session, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.name
 
     def create_session(self, input_session_id: str = None):
-        if self.session is None:
+        try:
+            Session.objects.get(host_id=self)
+            logger.warning(f'Session for {self} already exists')
+        except Session.DoesNotExist:
             new_session_id = input_session_id
             if input_session_id is None:
                 new_session_id = self._get_unused_session_token()
-            tmp_session = Session.objects.create(session_id=new_session_id)
-            self.session_id = tmp_session
+            tmp_session = Session.objects.create(session_id=new_session_id, host_id=self)
+            return tmp_session
 
     def _get_unused_session_token(self):
         NUM_CHARS = 6

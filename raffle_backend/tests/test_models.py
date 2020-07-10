@@ -11,7 +11,8 @@ from raffle_backend.models import (
 
 class TestUser(TestCase):
     def test_base_constructor(self):
-        session = Session.objects.create(session_id='ABC123')
+        host = Host.objects.create(name='Fred', host_token='apowief2q[-90j')
+        session = Session.objects.create(session_id='ABC123', host_id=host)
         user = Participant(
             name='Fred', ip_address='127.0.0.1', session=session)
         self.assertTrue(isinstance(user, Participant))
@@ -21,38 +22,42 @@ class TestUser(TestCase):
 class TestHost(TestCase):
 
     def test_constructor_without_session_id(self):
-        host = Host(name='Velma', host_token='AkSefj90j#89wj4$GH9s4S)$Fj')
+        host = Host.objects.create(name='Velma', host_token='AP(IJW$W)G(J')
         self.assertTrue(isinstance(host, Host))
         self.assertEqual('Velma', str(host))
 
     def test_create_session_does_not_exist_yet(self):
-        host = Host(name='Velma', host_token='AkSefj90j#89wj4$GH9s4S)$Fj')
+        host = Host.objects.create(name='Velma', host_token='AP(IJW$W)G(Jj')
         expected_id = 'ABC123'
 
-        self.assertIsNone(host.session_id)
-        host.create_session(expected_id)
-        self.assertEqual(expected_id, host.session.session_id)
+        with self.assertRaises(Session.DoesNotExist):
+            self.assertIsNone(Session.objects.get(session_id=expected_id))
+        session = host.create_session(expected_id)
+        self.assertEqual(expected_id, session.session_id)
 
     def test_create_session_already_exists(self):
-        host = Host(name='Velma', host_token='AkSefj90j#89wj4$GH9s4S)$Fj')
-        fake_id = 'ABC123'
+        host = Host.objects.create(name='Velma', host_token='AP(IJW$W)G(Jj')
+        initial_id = 'ABC123'
 
-        self.assertIsNone(host.session_id)
-        host.create_session()
+        with self.assertRaises(Session.DoesNotExist):
+            self.assertIsNone(Session.objects.get(session_id=initial_id))
+        host.create_session(initial_id)
         # Create another one
-        host.create_session(fake_id)
-        self.assertNotEqual(fake_id, host.session.session_id)
+        host.create_session(initial_id)
+        self.assertEqual(1, len(Session.objects.filter(session_id=initial_id)))
 
 
 class TestSession(TestCase):
 
     def test_constructor(self):
-        session = Session('ABC123')
+        host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
+        session = Session(session_id='ABC123', host_id=host)
         self.assertTrue(isinstance(session, Session))
         self.assertEqual('ABC123', str(session))
 
     def test_add_winner_first_winner(self):
-        session = Session.objects.create(session_id='ABC123')
+        host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
+        session = Session.objects.create(session_id='ABC123', host_id=host)
         user = Participant.objects.create(
             name='Shaggy', ip_address='0.0.0.0', session=session)
 
@@ -64,7 +69,8 @@ class TestSession(TestCase):
         self.assertIsNotNone(Winner.objects.get(user=user))
 
     def test_add_winner_second_winner(self):
-        session = Session.objects.create(session_id='ABC123')
+        host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
+        session = Session.objects.create(session_id='ABC123', host_id=host)
         user = Participant.objects.create(
             name='Shaggy', ip_address='0.0.0.0', session=session)
         user2 = Participant.objects.create(
@@ -78,7 +84,8 @@ class TestSession(TestCase):
         self.assertEqual(2, len(Winner.objects.all()))
 
     def test_add_winner_duplicate_winner(self):
-        session = Session.objects.create(session_id='ABC123')
+        host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
+        session = Session.objects.create(session_id='ABC123', host_id=host)
         user = Participant.objects.create(
             name='Shaggy', ip_address='0.0.0.0', session=session)
         # breakpoint()
@@ -91,14 +98,16 @@ class TestSession(TestCase):
         self.assertEqual(1, len(Winner.objects.all()))
 
     def test_add_participant_first_participant(self):
-        session = Session.objects.create(session_id='ABC123')
+        host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
+        session = Session.objects.create(session_id='ABC123', host_id=host)
         session.add_participant(
             username='Velma', ip_addr='0.0.0.0')
         self.assertIsNotNone(Participant.objects.get(
             name='Velma', ip_address='0.0.0.0', session=session))
 
     def test_add_participant_not_first_participant(self):
-        session = Session.objects.create(session_id='ABC123')
+        host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
+        session = Session.objects.create(session_id='ABC123', host_id=host)
         session.add_participant(
             username='Velma', ip_addr='0.0.0.0')
         session.add_participant(
@@ -106,7 +115,8 @@ class TestSession(TestCase):
         self.assertEqual(2, len(Participant.objects.filter(session=session)))
 
     def test_add_participant_duplicate_participant(self):
-        session = Session.objects.create(session_id='ABC123')
+        host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
+        session = Session.objects.create(session_id='ABC123', host_id=host)
         session.add_participant(
             username='Velma', ip_addr='0.0.0.0')
         with transaction.atomic():
@@ -117,7 +127,8 @@ class TestSession(TestCase):
 
 class TestWinner(TestCase):
     def test_constructor(self):
-        session = Session.objects.create(session_id='ABC123')
+        host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
+        session = Session.objects.create(session_id='ABC123', host_id=host)
         tmp_user = Participant.objects.create(
             name='Scooby', ip_address='0.0.0.0', session=session)
         winner = Winner.objects.create(user=tmp_user, session=session)

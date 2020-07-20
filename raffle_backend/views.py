@@ -21,10 +21,9 @@ class ParticipantViewset(viewsets.ModelViewSet):
             try:
                 session = Session.objects.get(
                     session_id=request.data['session_id'])
-                Participant.objects.create(
-                    name=request.data['name'],
-                    ip_address=request.data['ip_address'],
-                    session=session)
+                logger.debug(f'Before: {Participant.objects.all()}')
+                session.add_participant(username=request.data['name'], ip_addr=request.data['ip_address'])
+                logger.debug(f'After: {Participant.objects.all()}')
                 return Response({'status': f"New user {request.data['name']} successfully added to session {request.data['session_id']}"})
             except Session.DoesNotExist:
                 logger.warning(

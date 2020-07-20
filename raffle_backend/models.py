@@ -60,6 +60,7 @@ class Session(models.Model):
                 f'Adding User {username} at IP {ip_addr} to current session {self}')
             return Participant.objects.create(name=username, ip_address=ip_addr, session=self)
         except IntegrityError:
+            # TODO: Have this raise an exception so I can catch it in the view
             logger.warning(
                 f'Tried to add duplicate user {username}:{ip_addr} to current session.')
 

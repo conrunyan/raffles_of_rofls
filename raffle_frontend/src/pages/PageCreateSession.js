@@ -4,7 +4,7 @@ class PageCreateSession extends React.Component {
   state = {
     sessionName: null,
     hostName: null,
-  }
+  };
   render() {
     return (
       <div className="ui container">
@@ -28,6 +28,7 @@ class PageCreateSession extends React.Component {
               }
             />
           </div>
+          <div className="ui submit button">Create Session</div>
         </div>
       </div>
     );

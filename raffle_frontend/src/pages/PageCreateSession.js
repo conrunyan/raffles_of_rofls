@@ -4,26 +4,32 @@ import { connect } from "react-redux";
 
 import FormInput from "../components/FormInput";
 import ErrorMessage from "../components/ErrorMessage";
+import { createSession } from "../redux/actions";
 
 class PageCreateSession extends React.Component {
   renderInput = ({ input, label, meta }) => {
-    console.log(meta);
     const className = meta.touched && meta.error ? "field error" : "field";
     return (
       <FormInput
         className={className}
         label={label}
         input={{ ...input }}
-        errComponent={<ErrorMessage errMsg={meta.error} touched={meta.touched} />}
+        errComponent={
+          <ErrorMessage errMsg={meta.error} touched={meta.touched} />
+        }
       />
     );
+  };
+
+  onSubmit = (formData) => {
+    this.props.createSession(formData);
   };
 
   render() {
     return (
       <div className="ui container">
         <h1 className="ui header centered">Host a Session</h1>
-        <form className="ui form error">
+        <form className="ui form error" onSubmit={this.props.handleSubmit(this.onSubmit)}>
           <Field
             name="hostName"
             component={this.renderInput}
@@ -34,7 +40,7 @@ class PageCreateSession extends React.Component {
             component={this.renderInput}
             label={"Session Name"}
           />
-          <div className="ui submit button">Create Session</div>
+          <button className="ui button primary">Create Session</button>
         </form>
       </div>
     );
@@ -54,8 +60,10 @@ const validate = (formValues) => {
 };
 
 const formWrapped = reduxForm({
-  form: "streamCreate",
+  form: "pageCreateSession",
   validate: validate,
 })(PageCreateSession);
 
-export default connect(null, {})(formWrapped);
+export default connect(null, {
+  createSession,
+})(formWrapped);

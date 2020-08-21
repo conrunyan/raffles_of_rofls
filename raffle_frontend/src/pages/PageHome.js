@@ -10,6 +10,7 @@ class PageHome extends React.Component {
           <img
             className="ui small image"
             src="https://cdn.pixabay.com/photo/2014/04/03/00/39/ice-cream-308972_960_720.png"
+            alt="icecream"
           />
           <h1 className="centered">Home Page</h1>
           <div className="ui borderless menu">
@@ -19,7 +20,7 @@ class PageHome extends React.Component {
               </Link>
             </div>
             <div className="horizontally fitted item">
-              <Link>
+              <Link to="/participant/join">
                 <button className="ui blue button">Join Raffle</button>
               </Link>
             </div>

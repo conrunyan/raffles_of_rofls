@@ -3,7 +3,7 @@ import hosts from "../../api/hosts";
 
 export const createSession = (sessionInfo) => async (dispatch) => {
   console.log(sessionInfo);
-  hosts.post("", {
+  hosts.post("/", {
     name: sessionInfo.hostName,
     host_token: sessionInfo.sessionName,
   });

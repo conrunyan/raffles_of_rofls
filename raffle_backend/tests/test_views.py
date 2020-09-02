@@ -8,26 +8,38 @@ from raffle_backend.models import (
     Participant
 )
 
+
 class TestParticipant(APITestCase):
     def setUp(self):
         self.host = Host.objects.create(name='Fred', host_token='AP(IJW$W)G(J')
-        self.session = Session.objects.create(session_id='ABC123', host_id=self.host)
-    
+        self.session = Session.objects.create(
+            session_id='ABC123', host_id=self.host)
+
     def test_post_request_add_participant_existing_session(self):
-        self.fail()
-    
+        data = {
+            'name': 'Timmy',
+            'session_id': 'ABC123',
+            'ip_address': '0.0.0.0'
+        }
+        response = self.client.post('/participants/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIsNotNone(Participant.objects.get(
+            session=self.session, name=data['name'], ip_address=data['ip_address']))
+
     def test_post_request_add_participant_no_session(self):
         self.fail()
-    
+
     def test_post_request_add_participant_bad_request(self):
         data = {'name': 'DabApps'}
-        response = self.client.post('/sessions/', data, format='json')
+        response = self.client.post('/participants/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         with self.assertRaises(Participant.DoesNotExist):
             Participant.objects.get(session=self.session)
 
+
 class TestHost(APITestCase):
     pass
+
 
 class TestSession(APITestCase):
     pass

@@ -47,8 +47,8 @@ class TestParticipant(APITestCase):
 
 
 class TestHost(APITestCase):
-    pass
+    def test_post_request_create_host(self):
+        self.fail()
 
-
-class TestSession(APITestCase):
-    pass
+    def test_post_request_create_host_and_session(self):
+        self.fail()

@@ -27,8 +27,16 @@ class TestParticipant(APITestCase):
             session=self.session, name=data['name'], ip_address=data['ip_address']))
 
     def test_post_request_add_participant_no_session(self):
-        self.fail()
-
+        data = {
+            'name': 'Timmy',
+            'session_id': 'ZZZZZZ',
+            'ip_address': '0.0.0.0'
+        }
+        response = self.client.post('/participants/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        with self.assertRaises(Participant.DoesNotExist):
+            Participant.objects.get(
+                session=self.session, name=data['name'], ip_address=data['ip_address'])
     def test_post_request_add_participant_bad_request(self):
         data = {'name': 'DabApps'}
         response = self.client.post('/participants/', data, format='json')

@@ -37,6 +37,7 @@ class TestParticipant(APITestCase):
         with self.assertRaises(Participant.DoesNotExist):
             Participant.objects.get(
                 session=self.session, name=data['name'], ip_address=data['ip_address'])
+
     def test_post_request_add_participant_bad_request(self):
         data = {'name': 'DabApps'}
         response = self.client.post('/participants/', data, format='json')

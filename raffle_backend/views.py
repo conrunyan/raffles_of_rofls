@@ -42,7 +42,7 @@ class ParticipantViewset(viewsets.ModelViewSet):
 
 class HostViewset(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows hosts to be viewed or edited.
     """
     queryset = Host.objects.all()
     serializer_class = HostSerializer
@@ -50,7 +50,7 @@ class HostViewset(viewsets.ModelViewSet):
 
 class SessionViewset(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows sessions to be viewed or edited.
     """
     queryset = Session.objects.all()
     serializer_class = SessionSerializer

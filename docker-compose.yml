@@ -20,7 +20,6 @@ services:
     build: ./raffle_frontend
     volumes:
       - ./raffle_frontend:/app
-      - /app/node_modules
     ports:
       - '3000:3000'
     stdin_open: true

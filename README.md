@@ -16,7 +16,7 @@ After cloning the repository down to you machine, run the following command in y
 
 ```bash
 docker-compose up -d
-
-These are currently the default ports:
-Django API - 8000
-React Frontend - 3000
+```
+**Default ports**
+* Django API - 8000
+* React Frontend - 3000

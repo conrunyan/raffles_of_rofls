@@ -9,8 +9,8 @@ The goal is to eliminate the need for authentication of users, and instead do a 
 **How to start a development server**
 
 Requirements:
-Docker
-Docker Compose (comes pre-installed with Docker Desktop if you're on Windows, and I believe Mac OS)
+* Docker
+* Docker Compose (comes pre-installed with Docker Desktop if you're on Windows, and I believe Mac OS)
 
 After cloning the repository down to you machine, run the following command in your terminal:
 

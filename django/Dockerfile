@@ -13,3 +13,8 @@ COPY . /app/backend/
 COPY ./raffles_of_rofls /app/backend/
 COPY ./raffle_backend /app/backend/
 COPY ./manage.py /app/backend/
+
+# Create plank DB
+
+RUN python manage.py makemigrations
+RUN python manage.py migrate

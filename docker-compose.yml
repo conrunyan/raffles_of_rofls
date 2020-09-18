@@ -7,25 +7,24 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  web:
-    build: .
+  django:
+    build: ./django
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/raffle_backend
+      - .:/django
     ports:
       - "8000:8000"
     depends_on:
       - db
-  client:
-    build: ./raffle_frontend
+  react:
+    build: ./react
     volumes:
-      - ./raffle_frontend:/app
+      - ./react
     ports:
       - '3000:3000'
-    stdin_open: true
+    tty: true
     environment:
       - NODE_ENV=development
     depends_on:
-      - web
-    command:
-      yarn start
+      - django
+    command: yarn run start
